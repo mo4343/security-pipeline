@@ -32,7 +32,7 @@ jobs:
       - name: Send Report to Invicti Enterprise
         env:
           INVICTI_API_TOKEN: ${{ jZxOQ68mwdKFLmGkM6DNt8q1jPmF7zbQP+khHNrs98Y=","CreateDate":"2025-08-24T07:35:45.9426063Z }}
-          INVICTI_API_URL: ${{ http://localhost/websites/globaldashboard/ }}
+          INVICTI_API_URL: ${{ https://localhost:3443/ }}
         run: |
           curl -X POST "$INVICTI_API_URL/api/1.0/scans/new" \
           -H "Authorization: Bearer $INVICTI_API_TOKEN" \
