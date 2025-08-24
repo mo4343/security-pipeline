@@ -1,0 +1,40 @@
+ name: Security Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Nuclei
+        run: |
+          curl -sL https://github.com/projectdiscovery/nuclei/releases/download/v3.2.3/nuclei_3.2.3_linux_amd64.zip -o nuclei.zip
+          unzip nuclei.zip
+          sudo mv nuclei /usr/local/bin/
+
+      - name: Run Nuclei Scan
+        run: |
+          nuclei -u https://example.com -o nuclei-report.txt
+
+      - name: Upload Scan Results (GitHub)
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuclei-results
+          path: nuclei-report.txt
+
+      - name: Send Report to Invicti Enterprise
+        env:
+          INVICTI_API_TOKEN: ${{ jZxOQ68mwdKFLmGkM6DNt8q1jPmF7zbQP+khHNrs98Y=","CreateDate":"2025-08-24T07:35:45.9426063Z }}
+          INVICTI_API_URL: ${{ http://localhost/websites/globaldashboard/ }}
+        run: |
+          curl -X POST "$INVICTI_API_URL/api/1.0/scans/new" \
+          -H "Authorization: Bearer $INVICTI_API_TOKEN" \
+          -F "file=@nuclei-report.txt"
+
