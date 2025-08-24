@@ -13,6 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # --- NUCLEI ---
       - name: Set up Nuclei
         run: |
           curl -sL https://github.com/projectdiscovery/nuclei/releases/download/v3.2.3/nuclei_3.2.3_linux_amd64.zip -o nuclei.zip
@@ -29,12 +30,16 @@ jobs:
           name: nuclei-results
           path: nuclei-report.txt
 
-      - name: Send Report to Invicti Enterprise
+      # --- INVICTI ---
+      - name: Trigger Invicti Scan
         env:
-          INVICTI_API_TOKEN: ${{ jZxOQ68mwdKFLmGkM6DNt8q1jPmF7zbQP+khHNrs98Y=","CreateDate":"2025-08-24T07:35:45.9426063Z }}
-          INVICTI_API_URL: ${{ https://localhost:80 }}
+          INVICTI_API_TOKEN: "jZxOQ68mwdKFLmGkM6DNt8q1jPmF7zbQP+khHNrs98Y=","CreateDate":"2025-08-24T07:35:45.9426063Z"
         run: |
-          curl -X POST "$INVICTI_API_URL/api/1.0/scans/new" \
+          curl -X POST "https://your-invicti-server.com/api/1.0/scans/new" \
           -H "Authorization: Bearer $INVICTI_API_TOKEN" \
-          -F "file=@nuclei-report.txt"
-
+          -H "Content-Type: application/json" \
+          -d '{
+                "profileId": "11111111-2222-3333-4444-555555555555",
+                "target": "https://example.com",
+                "reportPolicyId": "66666666-7777-8888-9999-000000000000"
+              }'
